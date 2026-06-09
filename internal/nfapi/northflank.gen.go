@@ -320,6 +320,27 @@ func (e PostProjectsSecrets200JSONResponseBodyDataType) Valid() bool {
 	}
 }
 
+// Defines values for GetProjectsSecretsSecretidParamsShow.
+const (
+	All       GetProjectsSecretsSecretidParamsShow = "all"
+	Inherited GetProjectsSecretsSecretidParamsShow = "inherited"
+	This      GetProjectsSecretsSecretidParamsShow = "this"
+)
+
+// Valid indicates whether the value is a known member of the GetProjectsSecretsSecretidParamsShow enum.
+func (e GetProjectsSecretsSecretidParamsShow) Valid() bool {
+	switch e {
+	case All:
+		return true
+	case Inherited:
+		return true
+	case This:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for GetProjectsSecretsSecretid200JSONResponseBodyDataRestrictionsNfObjectsType.
 const (
 	GetProjectsSecretsSecretid200JSONResponseBodyDataRestrictionsNfObjectsTypeJob     GetProjectsSecretsSecretid200JSONResponseBodyDataRestrictionsNfObjectsType = "job"
@@ -551,13 +572,13 @@ type bearerAuthContextKey string
 // GetProjectsParams defines parameters for GetProjects.
 type GetProjectsParams struct {
 	// PerPage The number of results to display per request. Maximum of 100 results per page.
-	PerPage interface{} `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PerPage *int `form:"per_page,omitempty" json:"per_page,omitempty"`
 
 	// Page The page number to access.
-	Page interface{} `form:"page,omitempty" json:"page,omitempty"`
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
 
 	// Cursor The cursor returned from the previous page of results, used to request the next page.
-	Cursor interface{} `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
 
 // GetProjectsProjectid200JSONResponseBodyDataCustomRegistryConfigurationProvider defines parameters for GetProjectsProjectid.
@@ -572,13 +593,13 @@ type GetProjectsProjectid200JSONResponseBodyDataServicesServiceType string
 // GetProjectsSecretsParams defines parameters for GetProjectsSecrets.
 type GetProjectsSecretsParams struct {
 	// PerPage The number of results to display per request. Maximum of 100 results per page.
-	PerPage interface{} `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PerPage *int `form:"per_page,omitempty" json:"per_page,omitempty"`
 
 	// Page The page number to access.
-	Page interface{} `form:"page,omitempty" json:"page,omitempty"`
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
 
 	// Cursor The cursor returned from the previous page of results, used to request the next page.
-	Cursor interface{} `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
 
 // GetProjectsSecrets200JSONResponseBodyDataSecretsRestrictionsNfObjectsType defines parameters for GetProjectsSecrets.
@@ -703,8 +724,11 @@ type PostProjectsSecrets200JSONResponseBodyDataType string
 // GetProjectsSecretsSecretidParams defines parameters for GetProjectsSecretsSecretid.
 type GetProjectsSecretsSecretidParams struct {
 	// Show Which secrets to display - if set to `this` only the group's secrets are displayed, if set to `inherited` only secrets from linked addons are displayed, if set to `all` or not provided, both are displayed.
-	Show interface{} `form:"show,omitempty" json:"show,omitempty"`
+	Show *GetProjectsSecretsSecretidParamsShow `form:"show,omitempty" json:"show,omitempty"`
 }
+
+// GetProjectsSecretsSecretidParamsShow defines parameters for GetProjectsSecretsSecretid.
+type GetProjectsSecretsSecretidParamsShow string
 
 // GetProjectsSecretsSecretid200JSONResponseBodyDataRestrictionsNfObjectsType defines parameters for GetProjectsSecretsSecretid.
 type GetProjectsSecretsSecretid200JSONResponseBodyDataRestrictionsNfObjectsType string
@@ -823,25 +847,25 @@ type PatchProjectsSecretsSecretid200JSONResponseBodyDataType string
 // GetTeamsParams defines parameters for GetTeams.
 type GetTeamsParams struct {
 	// PerPage The number of results to display per request. Maximum of 100 results per page.
-	PerPage interface{} `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PerPage *int `form:"per_page,omitempty" json:"per_page,omitempty"`
 
 	// Page The page number to access.
-	Page interface{} `form:"page,omitempty" json:"page,omitempty"`
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
 
 	// Cursor The cursor returned from the previous page of results, used to request the next page.
-	Cursor interface{} `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
 
 // GetTeamProjectsParams defines parameters for GetTeamProjects.
 type GetTeamProjectsParams struct {
 	// PerPage The number of results to display per request. Maximum of 100 results per page.
-	PerPage interface{} `form:"per_page,omitempty" json:"per_page,omitempty"`
+	PerPage *int `form:"per_page,omitempty" json:"per_page,omitempty"`
 
 	// Page The page number to access.
-	Page interface{} `form:"page,omitempty" json:"page,omitempty"`
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
 
 	// Cursor The cursor returned from the previous page of results, used to request the next page.
-	Cursor interface{} `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
 
 // PostProjectsSecretsJSONRequestBody defines body for PostProjectsSecrets for application/json ContentType.
@@ -1115,28 +1139,40 @@ func NewGetProjectsRequest(server string, params *GetProjectsParams) (*http.Requ
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PerPage != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", *params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -1222,28 +1258,40 @@ func NewGetProjectsSecretsRequest(server string, projectId string, params *GetPr
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PerPage != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", *params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -1390,12 +1438,16 @@ func NewGetProjectsSecretsSecretidRequest(server string, projectId string, secre
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "show", params.Show, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Show != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "show", *params.Show, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -1494,28 +1546,40 @@ func NewGetTeamsRequest(server string, params *GetTeamsParams) (*http.Request, e
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PerPage != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", *params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -1567,28 +1631,40 @@ func NewGetTeamProjectsRequest(server string, teamId string, params *GetTeamProj
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PerPage != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "per_page", *params.PerPage, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {

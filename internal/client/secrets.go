@@ -115,9 +115,10 @@ func (c *Client) CreateProjectSecret(ctx context.Context, in CreateSecretInput) 
 
 // GetProjectSecret fetches a single secret group.  Returns ErrNotFound on 404.
 func (c *Client) GetProjectSecret(ctx context.Context, projectID, secretID string) (*SecretGroup, error) {
+	show := nfapi.GetProjectsSecretsSecretidParamsShow("this")
 	params := &nfapi.GetProjectsSecretsSecretidParams{
 		// "this" → only this group's own secrets, not inherited from addons
-		Show: "this",
+		Show: &show,
 	}
 	resp, err := c.api.GetProjectsSecretsSecretidWithResponse(ctx, projectID, secretID, params)
 	if err != nil {

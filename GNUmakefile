@@ -1,7 +1,7 @@
 MISE       := $(HOME)/.local/bin/mise
 GOEXEC     := $(MISE) exec --
 BINARY     := terraform-provider-northflank
-GOBIN      ?= $(HOME)/go/bin
+GOBIN      ?= $(shell $(HOME)/.local/bin/mise exec -- go env GOPATH)/bin
 
 default: build
 
@@ -11,7 +11,7 @@ build:
 
 .PHONY: install
 install:
-	$(GOEXEC) go install .
+	$(GOEXEC) go build -o $(GOBIN)/$(BINARY) .
 
 .PHONY: generate
 generate:

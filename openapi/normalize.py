@@ -23,16 +23,34 @@ import sys
 SWAGGER2_PARAM_CRUFT = {"in", "name", "required", "type", "description", "example"}
 
 
+def infer_schema_type(schema: dict, outer_param: dict) -> str:
+    """Infer an OA3 type string from schema constraints or outer param type."""
+    if "type" in schema:
+        return schema["type"]
+    if "type" in outer_param:
+        return outer_param["type"]
+    # Numeric constraints → integer; string constraints → string
+    if any(k in schema for k in ("minimum", "maximum", "multipleOf", "exclusiveMinimum", "exclusiveMaximum")):
+        return "integer"
+    if any(k in schema for k in ("minLength", "maxLength", "pattern", "format")):
+        return "string"
+    return "string"
+
+
 def normalize_param(param: dict) -> dict:
     """Strip Swagger-2 cruft from the nested schema object inside a parameter."""
     p = copy.deepcopy(param)
     schema = p.get("schema")
     if isinstance(schema, dict):
+        inferred_type = infer_schema_type(schema, p)
         for key in SWAGGER2_PARAM_CRUFT:
             schema.pop(key, None)
+        # Ensure the schema always has a type so oapi-codegen emits a concrete Go type
+        if "type" not in schema:
+            schema["type"] = inferred_type
         # If schema ended up empty or only has type from the outer param, rebuild it
         if not schema:
-            p["schema"] = {"type": p.get("type", "string")}
+            p["schema"] = {"type": inferred_type}
     else:
         # No schema at all — build one from swagger2 fields
         s: dict = {}
