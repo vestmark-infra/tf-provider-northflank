@@ -1,0 +1,27 @@
+# oapi-codegen configuration for the Northflank provider client.
+# Only the project-secrets operations needed for Terraform CRUD are generated.
+#
+# Regenerate with: make generate
+# (which runs: oapi-codegen -config openapi/oapi-codegen.yaml -o internal/nfapi/northflank.gen.go openapi/northflank-openapi.json)
+package: nfapi
+generate:
+  models: true
+  client: true
+
+# Restrict generation to project-secrets CRUD + global-secrets CRUD.
+# Addon-link operations, /details, and team-scoped duplicates are excluded.
+output-options:
+  include-operation-ids:
+    # Teams
+    - getTeams
+    # Projects (token-implicit team scope)
+    - getProjects
+    - getProjectsProjectid
+    # Projects (explicit team scope — distinct operationId assigned by normalizer)
+    - getTeamProjects
+    # Project secrets
+    - postProjectsSecrets
+    - getProjectsSecrets
+    - getProjectsSecretsSecretid
+    - patchProjectsSecretsSecretid
+    - deleteProjectsSecretsSecretid
